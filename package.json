@@ -1,0 +1,23 @@
+{
+  "name": "twitterclone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "twitter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/naredlarohithreddy/twitterclone.git"
+  },
+  "author": "naredlarohithreddy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/naredlarohithreddy/twitterclone/issues"
+  },
+  "homepage": "https://github.com/naredlarohithreddy/twitterclone#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pug": "^3.0.2"
+  }
+}
