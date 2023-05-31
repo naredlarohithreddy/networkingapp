@@ -7,8 +7,9 @@ var userschema=new schema({
     lastname:{type:String,required:true,trim:true},
     username:{type:String,required:true,trim:true,unique:true},
     email:{type:String,required:true,trim:true,unique:true},
-    password:{type:String,required:true}
-})
+    password:{type:String,required:true},
+    profilepicture:{default:"/images/defult.jpg",type:String}//how we will store the image
+},{timestamps:true});
 
 var usermodel=mongoose.model('userinfo',userschema);
 //model converts schema into a model

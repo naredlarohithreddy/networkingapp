@@ -1,0 +1,21 @@
+mixin createpostcontent(user)
+    .postcontainer  
+        .imgcontainer 
+            img(src=user.profilepicture, alt="default")
+        .textcontainerp
+            .introp
+                h1 #{user.firstname}
+                p #{user.email}
+            .textareatobepostedp
+                textarea#textareatobeposted(placeholder="write something!!",name="postingtext", cols="", rows="1")
+            .imagepostedp
+                img(src=user.imagetobeposted, alt="posting picture")
+                //- using multer we need to do this
+            .buttonposting  
+                button#submitpostbutton Post
+        
+        .optionscontainer
+            a(href="/postsettings")
+                i.fa-solid.fa-ellipsis
+        
+    

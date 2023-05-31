@@ -2,8 +2,8 @@ const express=require('express');
 const bodyparser=require('body-parser');
 const app=express();
 const router=express.Router();
-const userinfo=require("./schemas/userschema")
-console.log(userinfo)
+const userinfo=require("./schemas/userschema");
+const bcrypt=require("bcrypt");
 
 app.set("view engine","pug");
 app.set("views","views");
@@ -41,14 +41,19 @@ router.post("/",async (req,res,next)=>{
         if(user==null){
 
             var data = req.body;
+
+            var password=data.password;
+            let hash= await bcrypt.hash(password,10);
+            data.password=hash;
+            
             userinfo.create(data)
             .then((user)=>{
-                console.log(user)
-            })
+                req.session.user=user;
+                return res.redirect("/");
+            }) 
 
         }
         else{
-            console.log(user);
 
             if(user.email==email){
                 payload.error="Email already exists";
