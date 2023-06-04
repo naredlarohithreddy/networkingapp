@@ -8,7 +8,8 @@ var userschema=new schema({
     username:{type:String,required:true,trim:true,unique:true},
     email:{type:String,required:true,trim:true,unique:true},
     password:{type:String,required:true},
-    profilepicture:{default:"/images/defult.jpg",type:String}//how we will store the image
+    profilepicture:{ type: String, default: "public/images/default.jpg" },//how we will store the image
+    likes:[{type:schema.Types.ObjectId, ref:"postinfo"}],
 },{timestamps:true});
 
 var usermodel=mongoose.model('userinfo',userschema);

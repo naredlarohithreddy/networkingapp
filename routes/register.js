@@ -2,7 +2,7 @@ const express=require('express');
 const bodyparser=require('body-parser');
 const app=express();
 const router=express.Router();
-const userinfo=require("./schemas/userschema");
+const userinfo=require("../schemas/userschema");
 const bcrypt=require("bcrypt");
 
 app.set("view engine","pug");

@@ -24,23 +24,27 @@ app.set("views","views");
 app.use(express.static(path.join(__dirname,"public")));
 //anything inside the path served as static file
 
-const loginrouter=require("./login")
-const registerrouter=require("./register")
+const loginrouter=require("./routes/login");
+const registerrouter=require("./routes/register");
+const postrouter=require("./routes/api/posts");
+
 app.use("/login",loginrouter);
 app.use("/register",registerrouter);
+app.use("/api/posts",postrouter);
 
 app.get("/post",(req,res,next)=>{
     const payload={
         user:req.session.user
     }
     res.status(200).render("createpost",payload)
-});
+})
 
 app.get("/",middleware.requirelogin,(req,res,next)=>{
     console.log(req.body)
     const payload={
         title:"app",
-        user:req.session.user
+        user:req.session.user,
+        userjs:JSON.stringify(req.session.user)
     }
     res.status(200).render("home",payload);
 });

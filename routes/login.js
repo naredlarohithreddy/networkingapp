@@ -1,7 +1,7 @@
 const express=require('express');
 const http=require("http");
 const bodyparser=require('body-parser');
-const userinfo=require("./schemas/userschema");
+const userinfo=require("../schemas/userschema");
 const bcrypt=require("bcrypt");
 
 const app=express();

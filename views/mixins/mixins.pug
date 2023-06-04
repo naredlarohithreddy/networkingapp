@@ -1,11 +1,11 @@
 mixin createpostcontent(user)
     .postcontainer  
         .imgcontainer 
-            img(src=user.profilepicture, alt="default")
-        .textcontainerp
-            .introp
-                h1 #{user.firstname}
-                p #{user.email}
+            img(src='${user.profilepicture}', alt="default")
+        .textcontainer
+            .infoofpost
+                .username #{user.firstname}
+                .info #{user.email}
             .textareatobepostedp
                 textarea#textareatobeposted(placeholder="write something!!",name="postingtext", cols="", rows="1")
             .imagepostedp

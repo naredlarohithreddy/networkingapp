@@ -2,15 +2,7 @@ extends layouts/home-layout.pug
 
 block content
 
-    .postcontainer  
-        .imgcontainer 
-            img(src=user.profilepicture, alt="default")
-        .textcontainer 
-            .intro
-                h1 user.firstname  
-                p #{text}
-            .imageposted    
-                img(src="/images/default.jpg", alt="posted picture")
-        .optionscontainer
-            a(href="/postsettings")
-                i.fa-solid.fa-ellipsis
+    .supply
+
+block scripts 
+    script(src="/functions/getposts.js") 
