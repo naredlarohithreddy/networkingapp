@@ -14,7 +14,7 @@ h1,p{
     font-size:1.25em;
     font-weight:100%;
 }
-p,h1,h2,h3,h4,h5,h6{
+p,h1,h2,h3,h4,h5,h6,span{
     margin:0;
     padding:0;
 }
@@ -133,11 +133,25 @@ nav a:hover{
     margin:0;
     padding:0;
 }
-
+.retweetcontainer{
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+    align-items: flex-start;
+    justify-content: center;
+    width:100%;
+}
+.retweetcontainer span{
+    width:100%;
+    padding-left: 9.8%;
+    margin-top:0.5%;
+}
 .infoofpost{
     width:100%;
-    height:25%;
+    height:20%;
 }
+
 .username{
     padding-top:0.1em;
     height:60%;
@@ -192,7 +206,7 @@ nav a:hover{
     border-radius:10%;
     color:grey;
     outline:none;
-    height:2rem;
+    height:15%;
     background-color:white;
     display:flex;
     flex-direction:row;
@@ -206,8 +220,17 @@ button span{
 .postButtonContainer span{
     width: 20%;
 }
+.postButtonContainer.red button:hover{
+    background-color: blue;
+}
+.postButtonContainer.green button:hover{
+    background-color: green;
+}
 .postButtonContainer.red button.active{
     color: blue;
+}
+.postButtonContainer.green button.active{
+    color: green;
 }
 .optionscontainer{
     width:10%;
@@ -267,18 +290,52 @@ button span{
     width:20%;
     margin-top:1rem;
 }
-
 .buttonposting button{
     border:none;
     border-radius:10%;
     color:black;
     outline:none;
 }
-
 #submitpostbutton:disabled{
-    background-color:aliceblue ;
+    background-color:lightgrey;
 }
 
+.infoofcomment{
+    width:100%;
+    height:20%;
+}
+.textareatobecommentedp{
+    padding-top:0.5rem;
+    padding-bottom:0.5rem;
+    padding-right:0.5rem;
+}
+.textareatobecommentedp textarea{
+    width:100%;
+    resize:none;
+    border:none;
+    font-size:19px;
+    outline:none;
+}
+.imagecommentp{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+}
+.buttoncommenting{
+    display:flex;
+    flex-direction:column;
+    width:20%;
+    margin-top:1rem;
+}
+.buttoncommenting button{
+    border:none;
+    border-radius:10%;
+    color:black;
+    outline:none;
+}
+#submitcommentbutton:disabled{
+    background-color:lightgrey;
+}
 /* .titlecontainerp{
     display:flex;
     align-items:center;

@@ -10,6 +10,7 @@ var userschema=new schema({
     password:{type:String,required:true},
     profilepicture:{ type: String, default: "public/images/default.jpg" },//how we will store the image
     likes:[{type:schema.Types.ObjectId, ref:"postinfo"}],
+    retweet:[{type:schema.Types.ObjectId, ref:"postinfo"}]
 },{timestamps:true});
 
 var usermodel=mongoose.model('userinfo',userschema);

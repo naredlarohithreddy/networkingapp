@@ -1,8 +1,12 @@
+$(document).ready(()=>{
+    const submitbutton=$("#submitpostbutton");
+    submitbutton.prop("disabled",true);
+})
+
 $("#textareatobeposted").keyup(event=>{
     const textarea=event.target;
     const value=textarea.value.trim();
 
-    console.log(value);
     const submitbutton=$("#submitpostbutton");
 
     if(submitbutton.length==0){
@@ -18,8 +22,6 @@ $("#textareatobeposted").keyup(event=>{
 
 })
 
-//const button=document.getElementById("submitpostbutton");
-
 $("#submitpostbutton").click(()=>{
 
     const textarea=document.getElementById("textareatobeposted");
@@ -28,7 +30,7 @@ $("#submitpostbutton").click(()=>{
     const postobject={
         content : value
     }
-     
+    
     $.post("/api/posts",postobject,postdata=>{
 
         var html=createposthtml(postdata);
@@ -39,29 +41,11 @@ $("#submitpostbutton").click(()=>{
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var homeHTML = xhr.responseText;
-          
-                // Create a new DOMParser
                 var parser = new DOMParser();
-
-                // Parse the homeHTML string into a DOM element
                 var parsedHTML = parser.parseFromString(homeHTML, 'text/html');
-                // Prepend the container to the fetched home HTML content
                 var targetElement = parsedHTML.querySelector('.supply');
-                //var nextElement = parsedHTML.querySelector('.postcontainer');
-                // var parentElement = targetElement.parentNode;
-
-                // var posthtml=document.createElement("div");
-                // posthtml.className='postcontainer';
-                //targetElement.innerHTML=html;
-
-                // posthtml.innerHTML=html;
                 targetElement.insertAdjacentHTML("afterbegin",html);
-
-                // parentElement.insertBefore(posthtml,targetElement);
-                // Replace the current page with the updated home HTML content
-                document.open();
-                document.write(parsedHTML.documentElement.innerHTML);
-                document.close();
+                window.location.href="/";
             }
         };
         xhr.open('GET', '/', true);
@@ -70,44 +54,99 @@ $("#submitpostbutton").click(()=>{
     })
 })
 
-
 function createposthtml(postdata){
 
+    console.log(postdata)
     if(postdata._id===undefined){
         alert("not populated")
     }
 
+    var isretweet=postdata.retweetdata!==undefined;
+    var retweetedby=isretweet?postdata.user.username:null;
+
+    postdata=isretweet?postdata.retweetdata : postdata;  
+
+    var postid=postdata._id;
     var postedby=postdata.user;
     var postedname=postedby.firstname+" "+postedby.lastname;
     var timestamp=timeDifference(new Date(),new Date(postdata.createdAt));
+    var comment=postdata.commentdata!==undefined;
+    var commentpost;
+    var g,commenteduser;
+
+    if(comment){
+        commentpost=postdata.commentdata;
+        g=commentpost.user;
+        if(g===undefined){
+            $.get("/api/posts/"+postid,results=>{
+                console.log("1")
+                console.log(results)
+                commentpost=results.commentdata;
+                g=commentpost.user;
+                commenteduser=g.username;
+                console.log(commenteduser);
+            })
+        }
+        else if(g.username===undefined){
+            $.get("/api/posts/"+postid,results=>{
+                console.log("2")
+                console.log(results)
+                commentpost=results.commentdata;
+                g=commentpost.user;
+                commenteduser=g.username;
+                console.log(commenteduser);
+            })
+        }
+        else{
+            console.log("3")
+            if(g.username)commenteduser=g.username;
+            console.log(commenteduser);
+        }
+    }
+    
+    
+
+    var retweettext="";
+    var commentto="";
+    if(commenteduser){
+        commentto=`<div>commented to <a class="anchor" href="/profile/${commenteduser}">${commenteduser}</a></div>`;
+    }
+    
+    if(isretweet){
+        retweettext=`<span><i class="fas fa-retweet"></i>   retweeted by <a class="anchor" href="/profile/${retweetedby}">${retweetedby}</a></span>`;
+    }
 
     return `
-        <div class="postcontainer" data-id="${postdata._id}">
-            <div class="imgcontainer"> <img src="/images/default.jpg" alt="default"/></div>
-            <div class="textcontainer"> 
-                <div class="post">
-                        <div class="infoofpost">
-                            <div class="username">${postedname}</div>
-                            <div class="info">@${postedby.username}     ${timestamp}</div>
+        <div class="mainpost">
+            <div class="retweetcontainer">${retweettext}</div> 
+            <div class="postcontainer" data-id="${postdata._id}">
+                <div class="imgcontainer"> <img src="/images/default.jpg" alt="default"/></div>
+                <div class="textcontainer"> 
+                    <div class="post">
+                            <div class="infoofpost">
+                                <div class="username">${postedname}</div>
+                                <!--<div class="info">@${postedby.username}     ${timestamp}</div>-->
+                                ${commentto}
+                            </div>
+                            <div class="contentcontainer">
+                                <div class="contentpost">${postdata.content}</div>
+                                <div class="imageposted">   <img src="/images/default.jpg" alt="posted picture"/></div>
+                            </div>
+                    </div>
+                    <div class="postFooter">
+                        <div class="postButtonContainer">
+                            <a href="/comment"><button class="commentbutton"><i class="far fa-comment"></i></button></a>
                         </div>
-                        <div class="contentcontainer">
-                            <div class="contentpost">${postdata.content}</div>
-                            <div class="imageposted">   <img src="/images/default.jpg" alt="posted picture"/></div>
+                        <div class="postButtonContainer green">
+                            <button class="retweetbutton"><i class="fas fa-retweet"><span>${postdata.retweetusers.length||""}</span></i></button>
                         </div>
-                </div>
-                <div class="postFooter">
-                    <div class="postButtonContainer">
-                        <button><i class="far fa-comment"></i></button>
-                    </div>
-                    <div class="postButtonContainer">
-                        <button><i class="fas fa-retweet"></i></button>
-                    </div>
-                    <div class="postButtonContainer red">
-                        <button class="likebutton"><i class="far fa-heart"></i><span>${postdata.likes.length||""}</span></button>
+                        <div class="postButtonContainer red">
+                            <button class="likebutton"><i class="far fa-heart"></i><span>${postdata.likes.length||""}</span></button>
+                        </div>
                     </div>
                 </div>
+                <div class="optionscontainer"><a href="/postsettings"><i class="fa-solid fa-ellipsis"></i></a></div>
             </div>
-            <div class="optionscontainer"><a href="/postsettings"><i class="fa-solid fa-ellipsis"></i></a></div>
         </div>
     `;
 

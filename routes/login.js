@@ -45,14 +45,14 @@ router.post("/",async (req,res,next)=>{
                 return res.redirect("/");
             }
             
-            payload.error="user doesn't exist";
+            payload.error="fill the credentials correctly";
             return res.status(200).render("login",payload);
 
         }
 
     }
 
-    payload.error="fill the credentials correctly";
+    payload.error="user doesn't exist";
     return res.status(200).render("login",payload);
 })
 

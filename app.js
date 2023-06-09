@@ -27,10 +27,14 @@ app.use(express.static(path.join(__dirname,"public")));
 const loginrouter=require("./routes/login");
 const registerrouter=require("./routes/register");
 const postrouter=require("./routes/api/posts");
+const comment=require("./routes/comment")
+const commentpostsrouter=require("./routes/api/commentposts");
 
 app.use("/login",loginrouter);
 app.use("/register",registerrouter);
 app.use("/api/posts",postrouter);
+app.use("/api/commentposts",commentpostsrouter);
+app.use("/comment",comment);
 
 app.get("/post",(req,res,next)=>{
     const payload={
@@ -38,7 +42,6 @@ app.get("/post",(req,res,next)=>{
     }
     res.status(200).render("createpost",payload)
 })
-
 app.get("/",middleware.requirelogin,(req,res,next)=>{
     console.log(req.body)
     const payload={

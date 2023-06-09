@@ -4,9 +4,12 @@ const schema =mongoose.Schema;
 
 var postschema=new schema({
     content:{type:String,trim:true},
+    commentdata:{type:schema.Types.ObjectId, ref:"postinfo"},
     user:{type:schema.Types.ObjectId, ref:"userinfo"},
     postingimg :{type: String, default: "public/images/default.jpg" },//how we will store the image,
     likes:[{type:schema.Types.ObjectId, ref:"userinfo"}],
+    retweetusers:[{type:schema.Types.ObjectId, ref:"userinfo"}],
+    retweetdata:{type:schema.Types.ObjectId, ref:"postinfo"},
     pinned:Boolean
 },{timestamps:true});
 
