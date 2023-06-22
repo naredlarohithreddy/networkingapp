@@ -2,9 +2,18 @@ const express=require('express');
 const bodyparser=require('body-parser');
 const app=express();
 const router=express.Router();
+const fs=require('fs');
+const path=require('path');
 const userinfo=require("../../schemas/userschema");
 const postinfo=require("../../schemas/postschema");
-const session=require("express-session");
+const multer=require("multer");
+const { profile } = require('console');
+
+const storage=multer.diskStorage({
+    destination: path.join(__dirname,"../../uploads/images/")
+})
+
+const upload=multer({storage})
 
 app.set("view engine","pug");
 app.set("views","views");
@@ -12,8 +21,35 @@ app.set("views","views");
 app.use(bodyparser.urlencoded({extended:false}))
 
 router.get("/",async (req,res,next)=>{
-    
-    var results=await getPosts({});
+
+    var profileobj=req.query;
+    if(profileobj?.isreply!==undefined){
+        var reply=profileobj.isreply=="true";
+        profileobj.commentdata={$exists:reply};
+        delete profileobj.isreply;
+        
+    }
+    if(profileobj?.followingonly!==undefined){
+        var following=profileobj.followingonly==true;
+
+        var objectids=[];
+        req.session.user.following.forEach(element => {
+            objectids.push(element);
+        });
+        
+        objectids.push(req.session.user._id);
+        profileobj.user={$in:objectids};
+
+        delete profileobj.followingonly;
+    }
+
+    if(profileobj?.data!==undefined){
+        const regex = new RegExp(`.*${profileobj.data.split('').join('.*')}.*`, 'i');
+        profileobj.content={$regex:regex};
+        delete profileobj.data;
+    }
+
+    var results=await getPosts(profileobj);
     res.status(200).send(results);
     
 })
@@ -23,7 +59,17 @@ router.get("/:id",async (req,res,next)=>{
     var postid=req.params.id;
     var results=await getPosts({_id:postid});
     results=results[0];
-    res.status(200).send(results);
+
+    var result = {
+        postData: results
+    }
+
+    if(results?.commentdata !== undefined) {
+        result.commentData = results.commentdata;
+        result.replies = await getPosts({ commentdata: postid });
+    }
+
+    res.status(200).send(result);
     
 })
 
@@ -42,27 +88,36 @@ async function getPosts(filter) {
 }
 
 
-router.post("/",async (req,res,next)=>{
+router.post("/",upload.single("croppeddata"),async (req,res,next)=>{
 
-    if(!req.body.content){
-        return res.sendStatus(400);
-    }
+    const file=req.file;
+    var filepath,temppath,targetpath;
 
-    var posteddata={
-        content: req.body.content,
-        user:req.session.user,
-        postingimg :req.postingimg
+    if(file!==undefined){
+        var filepath=`/uploads/images/${req.file.filename}.jpeg`
+        var temppath=req.file.path;
+        var targetpath=path.join(__dirname+`../../..${filepath}`)
+
+        fs.rename(temppath,targetpath,async err=>{
+            if(err!=null){
+                console.log(err);
+                return res.sendStatus(400);
+            }
+        })
 
     }
     
-    if(req.body.commentdata){
-        posteddata.commentdata=req.body.commentdata;
+
+    const value=req.headers['x-value']
+
+    var posteddata={
+        content: value,
+        user:req.session.user,
+        postingimg :filepath,
     }
 
     postinfo.create(posteddata)
     .then(async newpost=>{
-        newpost=await postinfo.populate(newpost,{path:"commentdata"});
-        newpost=await userinfo.populate(newpost,{path:"commentdata.user"});
         newpost=await userinfo.populate(newpost,{path:"user"});
 
         res.status(201).send(newpost);
@@ -138,22 +193,69 @@ router.put("/:id/retweet",async (req,res,next)=>{
 
 })
 
-// router.put("/:id/comment:id1",async (req,res,next)=>{
+router.delete("/:id",async (req,res,next)=>{
 
-//     var postid=req.params.id;
-//     var commentedtopostid=req.params.id1;
-//     var userid=req.session.user._id;
+    var postid=req.params.id;
+    var result=await postinfo.findById(postid);
 
-//     var option = "$addToSet";
+    if(result?.postingimg!==undefined){
+        var filepath=path.join(__dirname+"../../../"+result.postingimg)
+        fs.unlink(filepath,err=>{
+            console.log(err);
+        })
+    }
 
-//     var post=await postinfo.findByIdAndUpdate(postid, { [option]: { commentsposts: commentedtopostid } },{new:true})
-//     .catch(err=>{
-//         console.log(err)
-//     })
-    
-//     res.status(200).send(post)
+    await postinfo.deleteMany({commentdata:postid})
+    .then(async ()=>await postinfo.deleteMany({retweetdata:postid}))
+    .then(async()=>await postinfo.findByIdAndDelete(postid))
+    .then(()=>{res.status(202).send("deleted");})
+    .catch(err=>{
+        console.log(err);
+    })
 
-// })
+})
 
+router.put("/:id",async (req,res,next)=>{
+    var postid=req.params.id;
+    var result=await postinfo.findById(postid);
+
+    var user=result.user;
+
+    if(result.pinned===false){
+
+        var allposts = await postinfo.find({ user: user }).catch(err => console.log(err));
+
+        var numberofpinned=0;
+        var postpinned=[];
+
+        await allposts.forEach(post=>{
+            if(post.pinned){
+                numberofpinned++;
+                postpinned.push(post)
+            }
+        })
+
+        if(numberofpinned==2){
+            var toberemovedfrompinned=postpinned.pop();
+            await postinfo.findByIdAndUpdate(toberemovedfrompinned._id,{pinned:false})
+            .catch(err=>console.log(err));
+        }
+    }
+
+
+    if(result.pinned===false){
+        await postinfo.findByIdAndUpdate(postid,{pinned:true})
+        .catch(err=>console.log(err));
+
+        return res.status(204).send('yes');
+    }
+
+    if(result.pinned===true){
+        await postinfo.findByIdAndUpdate(postid,{pinned:false})
+        .catch(err=>console.log(err));
+
+        return res.status(204).send('yes');
+    }
+})
 
 module.exports=router;

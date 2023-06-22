@@ -1,0 +1,18 @@
+extends layouts/chat-layout.pug
+
+block content   
+
+    .supply
+
+block searchbar 
+
+    .chatsearchcontainer 
+        a(href='/chats/search') 
+            i.fa-solid.fa-magnifying-glass.fa-lg
+
+    .chatcreatebutton   
+        a(href='/chats/newChat') 
+            i.fa-solid.fa-plus
+
+block scripts 
+    script(src="/functions/chats.js") 

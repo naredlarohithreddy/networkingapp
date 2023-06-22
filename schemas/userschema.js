@@ -8,9 +8,12 @@ var userschema=new schema({
     username:{type:String,required:true,trim:true,unique:true},
     email:{type:String,required:true,trim:true,unique:true},
     password:{type:String,required:true},
-    profilepicture:{ type: String, default: "public/images/default.jpg" },//how we will store the image
+    profilepicture:{ type: String },//how we will store the image
+    coverpicture:{ type: String },
     likes:[{type:schema.Types.ObjectId, ref:"postinfo"}],
-    retweet:[{type:schema.Types.ObjectId, ref:"postinfo"}]
+    retweet:[{type:schema.Types.ObjectId, ref:"postinfo"}],
+    following:[{type:schema.Types.ObjectId, ref:"userinfo"}],
+    followers:[{type:schema.Types.ObjectId, ref:"userinfo"}]
 },{timestamps:true});
 
 var usermodel=mongoose.model('userinfo',userschema);

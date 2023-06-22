@@ -2,6 +2,7 @@ const express=require('express');
 const http=require("http");
 const bodyparser=require('body-parser');
 const userinfo=require("../schemas/userschema");
+const bcrypt=require("bcrypt");
 const postinfo=require("../schemas/postschema");
 
 const app=express();
@@ -11,13 +12,14 @@ app.set("view engine","pug");
 app.set("views","views");
 app.use(bodyparser.urlencoded({extended:false}))
 
-
 router.get("/",async (req,res,next)=>{
 
-    var retweetedby = req.query.content;
-    var postid = req.query.postid;
-    var suser=req.session.user;
 
+    var retweetedby = req.query.content;
+    var suser=req.session.user;
+    var postid=req.query.postid;
+
+    
     await postinfo.findOne({_id:postid})
     .populate("user")
     .populate("retweetdata")
@@ -29,10 +31,19 @@ router.get("/",async (req,res,next)=>{
         results=await userinfo.populate(results,{path:"commentdata.user"})
         results=await userinfo.populate(results,{path:"retweetdata.user"})
 
+        
+        if(results===undefined || results==null){
+            const p={
+                userjs:JSON.stringify(suser),
+                title:"POST",
+            }
+            
+            return res.status(200).render("emptypage",p);
+        }
+
         var comment=results?.commentdata!==undefined;
         var commentpost;
         var g,commenteduser;
-
 
         if(comment){
             commentpost=results.commentdata;
@@ -63,8 +74,9 @@ router.get("/",async (req,res,next)=>{
         var postedby=results.user;
         var postedname=postedby.firstname+" "+postedby.lastname;
         var timestamp=timeDifference(new Date(),new Date(results.createdAt));
-
+        
         const payload={
+            title:"POST",
             postid:postid,
             retweetedby:retweetedby,
             results:results,
@@ -76,7 +88,7 @@ router.get("/",async (req,res,next)=>{
             commentto:commenteduser
         }
         
-        res.status(200).render("comment",payload);
+        res.status(200).render("displayposts",payload);
     })
     .catch(err=>console.log(err));
 

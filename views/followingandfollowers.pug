@@ -1,0 +1,17 @@
+extends layouts/home-layout.pug 
+
+block content
+    script. 
+        var postedby=!{postedby}
+        var selected='!{selectedtab}'
+
+    -following = user.following && user.following.length 
+    -followers = user.followers && user.followers.length 
+    
+    .tabcontainer   
+        +createtab("followers",`/profile/${user.username}/followers`,selectedtab!="following")
+        +createtab("following",`/profile/${user.username}/following`,selectedtab=="following")
+            
+    .supply
+block scripts 
+    script(src="/functions/followingandfollowers.js") 

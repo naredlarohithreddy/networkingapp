@@ -1,64 +1,71 @@
 extends layouts/comment-layout.pug 
 
 block content
-    .supply
-        .retweetcontainer
-            if(retweetedby!="undefined")
-                span
-                    i.fas.fa-retweet
-                    text               retweeted by
-                    a.anchor(href='/profile/'+retweetedby)            #{    retweetedby} 
-        .postcontainer(data-id=postid)
-            .imgcontainer
-                img(src='/images/default.jpg', alt='default')
-            .textcontainer
-                .post
+    script.
+        var userjs=!{userjs}
+    .supply 
+        .mainpost
+            .retweetcontainer
+                if(retweetedby!="undefined")
+                    span
+                        i.fas.fa-retweet
+                        text               retweeted by
+                        a.anchor(href='/profile/'+retweetedby)            #{    retweetedby} 
+            .postcontainer(data-id=postid)
+                .imgcontainer
+                    img(src=postedby.profilepicture, alt='/images/default.jpg')
+                .textcontainer
+                    .post
+                        .infoofpost
+                            .username 
+                                a(href="/profile/postedname") #{postedname}
+                            if(commentto!=undefined)
+                                span
+                                    text               commented to
+                                    a.anchor(href='/profile/'+commentto)            #{    commentto} 
+                            else
+                                .info @#{postedby.username}     #{timestamp}
+                        .contentcontainer
+                            .contentpost #{results.content}
+                            -if(results?.postingimg!=undefined)
+                                .imageposted
+                                    img.has(src=results.postingimg, alt='posted picture')
+                    .postFooter
+                            .postButtonContainer
+                                a(href='/comment')
+                                button.commentbutton
+                                    i.far.fa-comment
+                            .postButtonContainer.green
+                                button.retweetbutton
+                                    i.fas.fa-retweet
+                                    span #{results.retweetusers.length||''}
+                            .postButtonContainer.red
+                                button.likebutton
+                                    i.far.fa-heart
+                                span #{results.likes.length||''}
+                .optionscontainer
+                    a(href='/postsettings')
+                        i.fa-solid.fa-ellipsis
+        .mainpost
+            .postcontainer  
+                .imgcontainer 
+                    img(src=suser.profilepicture, alt='/images/default.jpg')
+                .textcontainer
                     .infoofpost
-                        .username #{postedname}
-                        if(commentto!="undefined")
-                            span
-                                text               commented to
-                                a.anchor(href='/profile/'+commentto)            #{    commentto} 
-                        else
-                            .info @#{postedby.username}     #{timestamp}
-                    .contentcontainer
-                        .contentpost #{results.content}
-                        .imageposted
-                            img(src='/images/default.jpg', alt='posted picture')
-                .postFooter
-                        .postButtonContainer
-                            a(href='/comment')
-                            button.commentbutton
-                                i.far.fa-comment
-                        .postButtonContainer.green
-                            button.retweetbutton
-                            i.fas.fa-retweet
-                                span #{results.retweetusers.length||''}
-                        .postButtonContainer.red
-                            button.likebutton
-                            i.far.fa-heart
-                            span #{results.likes.length||''}
-            .optionscontainer
-                a(href='/postsettings')
-                i.fa-solid.fa-ellipsis
-        .postcontainer  
-            .imgcontainer 
-                img(src='/images/default.jpg', alt="default")
-            .textcontainer
-                .infoofcomment
-                    .username #{suser.firstname}
-                    .info #{suser.email}
-                .textareatobecommentedp
-                    textarea#textareatobecommented(placeholder="write something!!",name="postingtext", cols="", rows="1")
-                .imagecommentp
-                    img(src='', alt="posting picture")
-                    //- using multer we need to do this
-                .buttoncommenting 
-                    button#submitcommentbutton Post
-            
-            .optionscontainer
-                a(href="/postsettings")
-                    i.fa-solid.fa-ellipsis
+                        .username #{suser.firstname}
+                        .info #{suser.email}
+                    .textareatobecommentedp
+                        textarea#textareatobecommented(placeholder="write something!!",name="postingtext", cols="", rows="1")
+                    .imagecommentp
+                        button.commentpicbutton(type='button', data-toggle='modal', data-target='#commentpicmodal')
+                            i.fa.fa-upload
+                    .buttoncommenting 
+                        button#submitcommentbutton Post
+                
+                .optionscontainer
+                    a(href="/postsettings")
+                        i.fa-solid.fa-ellipsis
+    +createcommentpicmodal()
 
 block scripts  
     script(src="functions/comments.js") 

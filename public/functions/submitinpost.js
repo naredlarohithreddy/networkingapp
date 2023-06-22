@@ -1,3 +1,6 @@
+var cropper;
+var croppeddata;
+
 $(document).ready(()=>{
     const submitbutton=$("#submitpostbutton");
     submitbutton.prop("disabled",true);
@@ -22,48 +25,106 @@ $("#textareatobeposted").keyup(event=>{
 
 })
 
-$("#submitpostbutton").click(()=>{
+$("#postpicupload").change(event=>{
+    const file=event.target.files[0];
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+        const image=document.createElement("img");
+        image.src=e.target.result;
+        $(".postpicpreview").append(image)
+
+        if(cropper!==undefined){
+            cropper=null;
+        }
+
+        cropper=new Cropper(image,{
+            aspectRatio:1/1,
+            background:false,
+        });
+
+    }
+
+    reader.readAsDataURL(file);
+})
+
+$(".postpicuploadbutton").click(event=>{
+
+    if(croppeddata!==undefined){
+        croppeddata=null;
+    }
+
+    croppeddata=cropper.getCroppedCanvas();
+
+    $('#postpicmodal').modal('hide');
+    if(croppeddata!==undefined){
+        console.log(croppeddata)
+        const submitbutton=$("#submitpostbutton");
+        submitbutton.prop("disabled",false);
+    }
+
+})
+
+$("#submitpostbutton").click(async ()=>{
 
     const textarea=document.getElementById("textareatobeposted");
     const value=textarea.value.trim();
 
-    const postobject={
-        content : value
-    }
-    
-    $.post("/api/posts",postobject,postdata=>{
+    var formdata=new FormData();
+    console.log(croppeddata)
+    if(croppeddata!==undefined){
 
-        var html=createposthtml(postdata);
-        textarea.val="";
-        $("#submitpostbutton").prop("disabled",true);
-        
-        var xhr=new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var homeHTML = xhr.responseText;
-                var parser = new DOMParser();
-                var parsedHTML = parser.parseFromString(homeHTML, 'text/html');
-                var targetElement = parsedHTML.querySelector('.supply');
-                targetElement.insertAdjacentHTML("afterbegin",html);
-                window.location.href="/";
-            }
-        };
-        xhr.open('GET', '/', true);
-        xhr.send();
+        await new Promise((resolve) => {
+            croppeddata.toBlob((blob) => {
+              formdata.append("croppeddata", blob);
+              resolve();
+            });
+        });
 
+    }  
+
+    $.ajax({
+        url:"/api/posts",
+        type:"POST",
+        processData:false,
+        contentType:false,
+        headers: {
+            "X-Value": value, // Send the value as a custom header
+        } ,
+        data:formdata,
+        success:(postdata)=>{
+            var html=createposthtml(postdata);
+            textarea.val="";
+            $(".postpicpreview").innerHTML="";
+            $("#submitpostbutton").prop("disabled",true);
+            
+            var xhr=new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var homeHTML = xhr.responseText;
+                    var parser = new DOMParser();
+                    var parsedHTML = parser.parseFromString(homeHTML, 'text/html');
+                    var targetElement = parsedHTML.querySelector('.supply');
+                    targetElement.insertAdjacentHTML("afterbegin",html);
+                    window.location.href="/";
+                }
+            };
+            xhr.open('GET', '/', true);
+            xhr.send();
+        },
     })
+
 })
 
 function createposthtml(postdata){
 
-    console.log(postdata)
     if(postdata._id===undefined){
         alert("not populated")
     }
 
     var isretweet=postdata.retweetdata!==undefined;
-    var retweetedby=isretweet?postdata.user.username:null;
+    var isretweet=postdata.retweetdata==null?0:1;
 
+    var retweetedby=isretweet?postdata.user.username:null;
     postdata=isretweet?postdata.retweetdata : postdata;  
 
     var postid=postdata._id;
@@ -79,32 +140,30 @@ function createposthtml(postdata){
         g=commentpost.user;
         if(g===undefined){
             $.get("/api/posts/"+postid,results=>{
-                console.log("1")
-                console.log(results)
-                commentpost=results.commentdata;
+                commentpost=results.commentData;
                 g=commentpost.user;
                 commenteduser=g.username;
-                console.log(commenteduser);
+                //console.log(commenteduser);
             })
         }
         else if(g.username===undefined){
             $.get("/api/posts/"+postid,results=>{
-                console.log("2")
-                console.log(results)
-                commentpost=results.commentdata;
+                commentpost=results.commentData;
                 g=commentpost.user;
                 commenteduser=g.username;
-                console.log(commenteduser);
+                //console.log(commenteduser);
             })
         }
         else{
-            console.log("3")
             if(g.username)commenteduser=g.username;
-            console.log(commenteduser);
+            //console.log(commenteduser);
         }
     }
     
-    
+    var content="";
+    if(postdata.content){
+        content=postdata.content;
+    }
 
     var retweettext="";
     var commentto="";
@@ -116,21 +175,35 @@ function createposthtml(postdata){
         retweettext=`<span><i class="fas fa-retweet"></i>   retweeted by <a class="anchor" href="/profile/${retweetedby}">${retweetedby}</a></span>`;
     }
 
+    var button="";
+    if(postdata?.user?._id==userjs?._id){
+        button=`<button type="button" class="postsettings" data-toggle="modal" data-target="#deletepostmodal"><i class="fa-solid fa-ellipsis"></i>
+        </button>`
+    }
+
+    var imageappend="";
+
+    if(postdata?.postingimg!=undefined){
+        imageappend=`<div class="imageposted">   <img class="has" src=${postdata.postingimg} alt="posted picture"/></div>`;
+    }
+
     return `
         <div class="mainpost">
             <div class="retweetcontainer">${retweettext}</div> 
             <div class="postcontainer" data-id="${postdata._id}">
-                <div class="imgcontainer"> <img src="/images/default.jpg" alt="default"/></div>
+                <div class="imgcontainer"> <img src=${postedby.profilepicture} alt="default"/></div>
                 <div class="textcontainer"> 
                     <div class="post">
                             <div class="infoofpost">
-                                <div class="username">${postedname}</div>
+                                <div class="username">
+                                    <a href="/profile/${postedby.username}">${postedby.username}</a>
+                                </div>
                                 <!--<div class="info">@${postedby.username}     ${timestamp}</div>-->
                                 ${commentto}
                             </div>
                             <div class="contentcontainer">
-                                <div class="contentpost">${postdata.content}</div>
-                                <div class="imageposted">   <img src="/images/default.jpg" alt="posted picture"/></div>
+                                <div class="contentpost">${content}</div>
+                                ${imageappend}
                             </div>
                     </div>
                     <div class="postFooter">
@@ -145,7 +218,9 @@ function createposthtml(postdata){
                         </div>
                     </div>
                 </div>
-                <div class="optionscontainer"><a href="/postsettings"><i class="fa-solid fa-ellipsis"></i></a></div>
+                <div class="optionscontainer">
+                    ${button}
+                </div>
             </div>
         </div>
     `;

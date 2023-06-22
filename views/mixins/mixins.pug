@@ -1,20 +1,117 @@
 mixin createpostcontent(user)
-    .postcontainer  
-        .imgcontainer 
-            img(src='${user.profilepicture}', alt="default")
-        .textcontainer
-            .infoofpost
-                .username #{user.firstname}
-                .info #{user.email}
-            .textareatobepostedp
-                textarea#textareatobeposted(placeholder="write something!!",name="postingtext", cols="", rows="1")
-            .imagepostedp
-                img(src=user.imagetobeposted, alt="posting picture")
-                //- using multer we need to do this
-            .buttonposting  
-                button#submitpostbutton Post
-        
-        .optionscontainer
-            a(href="/postsettings")
-                i.fa-solid.fa-ellipsis
-        
+    .mainpost
+        .postcontainer  
+            .imgcontainer 
+                img(src=user.profilepicture, alt="default")
+            .textcontainer
+                .infoofpost
+                    .username #{user.username}
+                    .info #{user.email}
+                .textareatobepostedp
+                    textarea#textareatobeposted(placeholder="write something!!",name="postingtext", cols="100", rows="5")
+                .imagepostedp
+                    button.postpicbutton(type='button', data-toggle='modal', data-target='#postpicmodal')
+                      i.fa.fa-upload
+                .buttonposting  
+                    button#submitpostbutton Post
+            
+            .optionscontainer
+                a(href="/postsettings")
+                    i.fa-solid.fa-ellipsis
+
+    +createpostpicmodal()
+
+mixin createhomemodal()
+    #deletepostmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='deletepostmodalCenterTitle', aria-hidden='true')
+      .modal-dialog.modal-dialog-centered(role='document')
+        .modal-content
+          .modal-footer
+            button.deletepostbutton(type='button') Delete
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close 
+
+mixin createprofiledeletemodal()
+    #deletepostmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='deletepostmodalCenterTitle', aria-hidden='true')
+      .modal-dialog.modal-dialog-centered(role='document')
+        .modal-content
+          .modal-footer
+            button.pinpost(type='button') pin
+            button.deletepostbutton(type='button') Delete
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close          
+
+mixin createunpindeletemodal()
+    #deleteunpinpostmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='deleteunpinpostmodalCenterTitle', aria-hidden='true')
+      .modal-dialog.modal-dialog-centered(role='document')
+        .modal-content
+          .modal-footer
+            button.pinpost(type='button') unpin
+            button.deletepostbutton(type='button') Delete
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close          
+
+mixin createprofilepicmodal()
+    #profilepicmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='profilepicmodalLabel', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#profilepicmodalLabel.modal-title upload picture
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') &times;
+          .modal-body
+            input#fileupload(type='file')
+            .imagepreview
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.dpuploadbutton(type='button') Save
+
+mixin createcoverpicmodal()
+    #coverpicmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='coverpicmodalLabel', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#coverpicmodalLabel.modal-title upload picture
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') &times;
+          .modal-body
+            input#cvupload(type='file')
+            .cvpreview
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.cvuploadbutton(type='button') Save
+
+mixin createpostpicmodal()
+    #postpicmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='postpicmodalLabel', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#postpicmodalLabel.modal-title upload picture
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') &times;
+          .modal-body
+            input#postpicupload(type='file')
+            .postpicpreview
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.postpicuploadbutton(type='button') Save
+
+mixin createcommentpicmodal()
+    #commentpicmodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='commentpicmodalLabel', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#commentpicmodalLabel.modal-title upload picture
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') &times;
+          .modal-body
+            input#commentpicupload(type='file')
+            .commentpicpreview
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.commentpicuploadbutton(type='button') Save
+
+mixin createfollowbutton(user,isfollowing)
+    - text =isfollowing?"Following":"Follow"
+    - buttonclass =isfollowing ? "follow following" : "follow notfollowing"   
+    button(class=buttonclass,data-id=user._id) #{text}
+
+mixin createtab(name,href,active)
+    - className = active?"active":"tab"
+    a(class=className,href=href) #{name}

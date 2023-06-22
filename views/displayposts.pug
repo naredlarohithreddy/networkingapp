@@ -1,0 +1,13 @@
+extends ./layouts/home-layout.pug
+
+block content
+    script. 
+        userjs=!{userjs}
+        postid='!{postid}'
+    .supply
+
+    +createhomemodal()
+
+block scripts
+    script(src="/functions/displayposts.js") 
+    

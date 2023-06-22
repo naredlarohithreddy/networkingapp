@@ -1,0 +1,20 @@
+extends layouts/home-layout.pug
+
+block content   
+
+    script.
+        selectedtab='!{selectedtab}'
+
+    .searchbarcontainer 
+        i.fa-solid.fa-magnifying-glass.fa-lg
+        input(class="searchbox" type="text",val=searchtext, placeholder="      search for user or posts")
+
+    .tabcontainer   
+        +createtab("posts",`/search/posts`,selectedtab!="users")
+        +createtab("users",`/search/users`,selectedtab=="users")
+            
+    .supply
+
+block scripts 
+    script(src="/functions/search.js") 
+

@@ -1,3 +1,5 @@
+var cropper;
+var croppeddata;
 // $(document).ready(()=>{
 //     const submitbutton=$("#submitcommentbutton");
 //     submitbutton.prop("disabled",true);
@@ -42,7 +44,46 @@ $("#textareatobecommented").keyup(event=>{
 
 })
 
-$("#submitcommentbutton").click(()=>{
+$("#commentpicupload").change(event=>{
+    const file=event.target.files[0];
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+        const image=document.createElement("img");
+        image.src=e.target.result;
+        $(".commentpicpreview").append(image)
+
+        if(cropper!==undefined){
+            cropper=null;
+        }
+
+        cropper=new Cropper(image,{
+            aspectRatio:1/1,
+            background:false,
+        });
+
+    }
+
+    reader.readAsDataURL(file);
+})
+
+$(".commentpicuploadbutton").click(event=>{
+
+    if(croppeddata!==undefined){
+        croppeddata=null;
+    }
+
+    croppeddata=cropper.getCroppedCanvas();
+
+    $('#commentpicmodal').modal('hide');
+    if(croppeddata!==undefined){
+        console.log(croppeddata)
+        const submitcommentbutton=$("#submitcommentbutton");
+        submitcommentbutton.prop("disabled",false);
+    }
+
+})
+
+$("#submitcommentbutton").click(async ()=>{
 
     const button=$("#submitcommentbutton")
 
@@ -54,26 +95,48 @@ $("#submitcommentbutton").click(()=>{
     const postid=b;
     button.data("id",postid);
 
+    const name=document.getElementsByClassName("username");
+    const n=name[0];
+    const val=n.innerText;
+
     const textarea=document.getElementById("textareatobecommented");
     const value=textarea.value;
 
-    const postobject={
-        topost : postid,
-        content : value
+    var formdata=new FormData();
+    
+    if(croppeddata!=undefined){
+
+        
+        await new Promise((resolve) => {
+            croppeddata.toBlob((blob) => {
+              formdata.append("croppeddata", blob);
+              resolve();
+            });
+        });
+
     }
 
-    textarea.value="";
-    button.prop("disabled",true);
-
-    $.post("/api/commentposts",postobject, postdata=>{
-        var html=createcommenthtml(postdata);
-        supply[0].insertAdjacentHTML("beforeend",html);
+    $.ajax({
+        url:"/api/commentposts",
+        type:"POST",
+        processData:false,
+        contentType:false,
+        headers: {
+            'X-Variable1': postid,
+            'X-Variable2': value,
+        },
+        data:formdata,
+        success:(postdata)=>{
+            textarea.value="";
+            button.prop("disabled",true);
+            var html=createcommenthtml(postdata,val);
+            supply[0].insertAdjacentHTML("beforeend",html);
+        }
     })
 
 })
 
-
-function createcommenthtml(postdata){
+function createcommenthtml(postdata,val){
 
     if(postdata._id===undefined){
         alert("not populated")
@@ -83,19 +146,31 @@ function createcommenthtml(postdata){
     var postedname=postedby.firstname+" "+postedby.lastname;
     var timestamp=timeDifference(new Date(),new Date(postdata.createdAt));
 
+    var comment="";
+    comment="replying to " + val;
+
+    var imageappend="";
+
+    if(postdata?.postingimg!=undefined){
+        imageappend=`<div class="imageposted">   <img class="has" src=${postdata.postingimg} alt="posted picture"/></div>`;
+    }
+    
+
     return `
         <div class="mainpost">
             <div class="postcontainer" data-id="${postdata._id}">
-                <div class="imgcontainer"> <img src="/images/default.jpg" alt="default"/></div>
+                <div class="imgcontainer"> <img src=${postedby.profilepicture} alt="/images/default.jpg"/></div>
                 <div class="textcontainer"> 
                     <div class="post">
                             <div class="infoofpost">
-                                <div class="username">${postedname}</div>
-                                <div class="info">@${postedby.username}     ${timestamp}</div>
+                                <div class="username">
+                                    <a href="/profile/${postedname}">${postedname}</a>
+                                </div>
+                                <div class="info">${comment}</div>
                             </div>
                             <div class="contentcontainer">
                                 <div class="contentpost">${postdata.content}</div>
-                                <div class="imageposted">   <img src="/images/default.jpg" alt="posted picture"/></div>
+                                ${imageappend}
                             </div>
                     </div>
                     <div class="postFooter">
@@ -110,13 +185,15 @@ function createcommenthtml(postdata){
                         </div>
                     </div>
                 </div>
-                <div class="optionscontainer"><a href="/postsettings"><i class="fa-solid fa-ellipsis"></i></a></div>
+                <div class="optionscontainer">
+                    <a href="/postsettings"><i class="fa-solid fa-ellipsis"></i>
+                    </a>
+                </div>
             </div>
         </div>
     `;
 
 }
-
 function timeDifference(current, previous) {
 
     var msPerMinute = 60 * 1000;

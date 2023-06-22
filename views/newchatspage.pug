@@ -1,0 +1,17 @@
+extends layouts/chat-layout.pug
+
+block content   
+
+
+        .divforsearch
+            .newsearchbarcontainer 
+                label(for="userSearchTextbox") To:
+                input(class="newsearchbox" type="text",val=searchtext, placeholder="      search for user or posts")
+            .searchedusers
+                
+            .divchatbutton
+                button#createchatbutton(disabled) create 
+        .supply
+
+block scripts 
+    script(src="/functions/chats.js") 

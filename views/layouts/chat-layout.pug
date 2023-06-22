@@ -27,8 +27,9 @@ html(lang="en")
                     a(href="/post")
                         i.fa-solid.fa-plus
                 .mainsection.col-md-8.col-10.col-lg-6 
-                    .titlecontainer 
-                        h1 comments
+                    .chattitlecontainer 
+                        h1 #{title}
+                        block searchbar
                     block content
                 .extra.d-none.d-md-block.col-md-2.col-lg-4    
                     a(href="/settings")

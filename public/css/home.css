@@ -3,12 +3,20 @@
     padding:0;
     margin:0;
 }
-head,body{
-    width:100%;
-    height:100%;
+a{
+    color:inherit;
 }
-a:hover{
-    text-decoration:none;
+button:focus{
+    outline:none;
+}
+head,body{
+    max-width:100%;
+    max-height:100%;
+}
+a:hover, a:visited, a:link, a:active
+{
+    color:black;
+    text-decoration: none;
 }
 h1,p{
     font-size:1.25em;
@@ -18,6 +26,7 @@ p,h1,h2,h3,h4,h5,h6,span{
     margin:0;
     padding:0;
 }
+
 nav{
     display:flex;
     flex-direction:column;
@@ -43,7 +52,9 @@ nav a:hover{
     border-radius:50%;
 }
 
-
+.wrapper > .row{
+    margin:0;
+}
 
 .mainsection{
     padding:0;
@@ -51,15 +62,14 @@ nav a:hover{
     border-right:0.1em solid grey ;
     display:flex;
     flex-direction:column;
-    width:50%;
-    height:100%;
+    flex-wrap:wrap;
 }
 .titlecontainer{
     display:flex;
     align-items:center;
     justify-content:center;
     border-bottom : 0.1em solid grey;
-    flex-shrink:0;
+    flex-shrink:1;
     height:2rem;
 }
 
@@ -88,9 +98,9 @@ nav a:hover{
 
 .postcontainer{
     width:100%;
-    height:15.5em;
     display:flex;
     flex-direction:row;
+    flex-wrap:wrap;
     justify-content:flex-start;
     border-bottom:0.1em solid grey ;
     flex-shrink:1;
@@ -101,12 +111,25 @@ nav a:hover{
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:0.4em;
+    padding:0.6em;
+}
+.imgcontainerff{
+    margin-top:0.2em;
+    width:20%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0.6em;
+}
+.imgcontainerff img{
+    width:60%;
+    height:3em;
+    border-radius:50%;
 }
 
 .imgcontainer img{
-    width:65%;
-    height:20%;
+    width:60%;
+    height:3em;
     border-radius:50%;
 }
 
@@ -117,22 +140,11 @@ nav a:hover{
     flex-shrink:1;
     font-size:1rem;
     width:80%;
-    height:15.5em;
     padding:0;
     margin:0;
 }
 
-.post{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    flex-shrink:1;
-    font-size:1rem;
-    width:100%;
-    height:85%;
-    margin:0;
-    padding:0;
-}
+
 .retweetcontainer{
     display: flex;
     flex-direction: row;
@@ -147,58 +159,81 @@ nav a:hover{
     padding-left: 9.8%;
     margin-top:0.5%;
 }
+
+.post{
+    display:flex;
+    flex-direction:row;
+    align-items:flex-start;
+    flex-shrink:1;
+    flex-wrap:wrap;
+}
+
 .infoofpost{
-    width:100%;
-    height:20%;
+    min-height:4em;
+    flex-basis:100%
 }
 
 .username{
-    padding-top:0.1em;
-    height:60%;
+    padding-top:0.5em;
+    height:50%;
     font-weight: bold;
 }
+.usernameff{
+    padding-top:1.5em;
+    height:50%;
+    font-weight: bold;
+}
+
 .info{
-    height:40%;
+    height:50%;
 }
 .contentcontainer{
     display:flex;
+    flex-wrap:wrap;
     flex-direction:column;
     align-items:flex-start;
     flex-shrink:1;
+    flex-basis:100%;
     font-size:1rem;
-    width:100%;
-    height:75%;
-    margin:0;
-    padding:0;
 }
 .contentpost{
-    width:100%;
-    height:20%;
+    flex-basis:100%;
+    flex-shrink:1;
+    padding-bottom:0.5em;
+    padding-top:0.2em;
 }
 .contentpost p{
     width:100%;
     height:100%;
 }
 .imageposted{
+    padding-top:0.2em;
+    padding-bottom:0.2em;
+    padding-right:0.2em;
     display:flex;
+    flex-basis:auto;
     flex-direction:row;
     align-items:center;
     justify-content:center;
-    height:80%;
-    margin:0;
+    height:200px;
+    margin:0; 
 }
 .imageposted img{
+    display:none;
+}
+.imageposted img.has{
+    display:block;
     width:100%;
     height:100%;
 }
 .postFooter{
     display:flex;
     flex-direction:row;
-    width:20%;
-    height:15%;
+    width:30%;
     align-items:center;
     justify-content:space-between;
-    margin:0;
+    margin-top:0.5em;
+    margin-bottom:0.5em;
     padding:0;
 }
 .postButtonContainer button{
@@ -206,31 +241,32 @@ nav a:hover{
     border-radius:10%;
     color:grey;
     outline:none;
-    height:15%;
     background-color:white;
-    display:flex;
-    flex-direction:row;
-    align-items:center;
-    justify-content:center;
+    position:relative;
+    width:2.8em;
+    text-align:start;
+/*     text-align:start;
+    width:40px; */
+}
+.postButtonContainer button span{
+    position:relative;
+    width:0.2em;
+}
+a{
+    outline:none;
+}
+button{
+    background-color:white;
 }
 button i,
 button span{
     pointer-events: none;
 }
-.postButtonContainer span{
-    width: 20%;
-}
-.postButtonContainer.red button:hover{
-    background-color: blue;
-}
-.postButtonContainer.green button:hover{
-    background-color: green;
-}
 .postButtonContainer.red button.active{
-    color: blue;
+    color: #00acee;
 }
 .postButtonContainer.green button.active{
-    color: green;
+    color: #00acee;
 }
 .optionscontainer{
     width:10%;
@@ -240,22 +276,16 @@ button span{
     flex-direction:column;
     align-items:center;
 }
-.optionscontainer a{
-    font-size:20px;
-    color:black;
-    width:100%;
+.optionscontainer button{
     display:flex;
+    width:30%;
+    height:10%;
     flex-direction:column;
     align-items:center;
+    border:none;
+    background-color:white;
+    outline:none;
 }
-.optionscontainer a:hover{
-    color:white;
-    background-color:grey;
-    border-radius:50%;
-}
-
-
-
 
 .textcontainerp{
     padding:0.8rem;
@@ -284,11 +314,31 @@ button span{
     flex-direction:column;
 }
 
+button[disabled]{
+    background-color:lightgrey;
+}
+.imagepostedp button{
+    width:10%;
+    margin-left:1.4em;
+}
+
+.imagecommentp{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+}
+
+.imagecommentp button{
+    width:10%;
+    margin-left:1.4em;
+}
+
 .buttonposting{
     display:flex;
     flex-direction:column;
     width:20%;
-    margin-top:1rem;
+    margin:0.5rem;
+    margin-left:0;
 }
 .buttonposting button{
     border:none;
@@ -296,8 +346,59 @@ button span{
     color:black;
     outline:none;
 }
-#submitpostbutton:disabled{
-    background-color:lightgrey;
+
+.modal-dialog.modal-dialog-centered {
+  max-width: 500px;
+}
+
+.modal-dialog{
+    max-width: 500px;
+    max-height:500px;
+}
+.modal-body {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.modal-footer{
+    display:flex;
+    flex-direction:column;
+}
+
+.imagepreview {
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.postpicpreview {
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.commentpicpreview {
+    max-height: 400px;
+    overflow: hidden;
+}
+/*  */
+
+
+.modal-content{
+    background-color: #34373a;
+}
+
+.pinpost,.deletepostbutton{
+    background-color: #5a6268;
+    width:100%;
+    color:white;
+    height:40px;
+    border-radius:7px;
+}
+.pinnedtweet{
+    padding-left:8%;
+}
+
+.btn.btn-secondary{
+    width:100%;
 }
 
 .infoofcomment{
@@ -326,6 +427,7 @@ button span{
     flex-direction:column;
     width:20%;
     margin-top:1rem;
+    margin-bottom:1rem;
 }
 .buttoncommenting button{
     border:none;
@@ -336,39 +438,6 @@ button span{
 #submitcommentbutton:disabled{
     background-color:lightgrey;
 }
-/* .titlecontainerp{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-bottom : 1.5px solid grey;
-    flex-shrink:0;
-    height:40px;
-} */
-/* 
-
-.postcontainerp{
-    width:100%;
-    height:100%;
-    display:flex;
-    flex-direction:row;
-    justify-content:flex-start;
-    border-bottom:1px solid grey ;
-} */
-/* 
-.imgcontainerp{
-    width:10%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:0.8rem;
-    
-} */
-
-/* .imgcontainerp img{
-    width:70%;
-    height:50px;
-    border-radius:50%;
-} */
 
 
 .textcontainerp{
@@ -381,3 +450,359 @@ button span{
     width:100%;
     height:100%;
 }
+
+.coverpicture{
+    height:200px;
+    width:100%;
+    background-color:#1DA1F2;
+    position:relative;
+}
+.coverpic{
+    position:absolute;
+    z-index:10;
+    height:200px;
+    width:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.coverpic img{
+    height:200px;
+    width:100%;
+}
+.profilepic{
+    width:120px;
+    height:120px;
+    margin-left:15px;
+    position:absolute;
+    z-index:999;
+    margin-top:140px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.profilepic img{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    border:4px solid white;
+    background:aliceblue;
+}
+
+.profilecontainer .messagesbutton{
+    text-align:right;
+    padding:10px;
+    min-height:60px;
+}
+
+.profilemessagebutton,
+.follow{
+    border:1px solid #1DA1F2;
+    color:#1DA1F2;
+    font-weight:bold;
+    padding:5px 15px;
+    border-radius:60px;
+    display:inline-block;
+    margin-left:10px;
+}
+
+.profilemessagebutton:hover,
+.follow:hover{
+    background-color:lightsteelblue;
+    
+}
+
+button.follow.notfollowing{
+    background-color:#1DA1F2;
+    color:white
+}
+
+.userdetails{
+    display:flex;
+    flex-direction:column;
+    padding-left:20px;
+}
+
+.profilename{
+    font-weight:bold;
+}
+
+.followerscontainer .value {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.followerscontainer span:not(.value) {
+    color: var(--greyText);
+}
+
+.followerscontainer a {
+    margin-right: 15px;
+}
+
+.followerscontainer a:hover {
+    border-bottom: 1px solid #000;
+}
+
+.tabcontainer{
+    display:flex;
+    flex-direction:row; 
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid lightgrey;
+    height:50px;
+}
+.tabcontainer a{
+    display:flex;
+    width:50%;
+    height:100%;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+}
+.tabcontainer a:hover{
+    background-color:lightgrey;
+}
+.tabcontainer a.active{
+    color:#1DA1F2;
+    border-bottom:2px solid #1DA1F2;
+}
+
+.profiletab{
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    height:140px;
+    border-bottom:1px solid black;
+}
+
+.profileimg{
+    width:10%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0.4em;
+    margin-top:3%;
+}
+
+.profileimg img{
+    
+    width:65%;
+    height:20%;
+    border-radius:50%;
+}
+
+.usernameprofile{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    flex-shrink:1;
+    font-size:1rem;
+    width:60%;
+    padding:0;
+    margin-top:4.5%;
+    font-weight:bolder;
+}
+
+.buttonprofile{
+    width:30%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-top:4.5%;
+}
+
+.profilepicbutton{
+    position:absolute;
+    background-color:transparent;
+    border:none;
+    font-size:35px;
+    color: rgba(0,0,0,0.5);
+    display:none;
+}
+
+.coverpicbutton{
+    position:absolute;
+    background-color:transparent;
+    border:none;
+    font-size:35px;
+    color: rgba(0,0,0,0.5);
+    display:none;
+}
+
+.profilepicbutton i{
+    color:#817878
+}
+
+.profilepic:hover .profilepicbutton{
+    display:block;
+}
+
+.coverpic:hover .coverpicbutton{
+    display:block;
+}
+
+.imagepreview{
+    max-width: 200px;
+    width:100%;
+    display:block;
+    max-width:100%;
+}
+
+
+.postpicpreview{
+    max-width: 200px;
+    width:100%;
+    display:block;
+    max-width:100%;
+}
+
+.cvpreview,.commentpicpreview{
+    max-width: 200px;
+    width:100%;
+    display:block;
+    max-width:100%;
+}
+.searchbarcontainer{
+    display:flex;
+    flex-direction:row;
+    padding:0.6em;
+    margin-bottom:10px;
+}
+
+.searchbarcontainer i{
+    margin: 0.85em 0.3em 0 0;
+}
+
+/* newmessagepage */
+
+.divforsearch{
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-bottom: 1px solid #aba5a5;
+}
+.newsearchbarcontainer{
+    display: flex;
+    align-items: center;
+    padding: 0.6em;
+    margin-bottom: 10px;
+    min-height: 50px;
+}
+
+.cancel i{
+    font-size:15px;
+}
+.cancel{
+    height:25px;
+    margin-right:5px;
+}
+
+.newsearchbarcontainer label{
+    margin-right: 10px;
+    margin-top:9px;
+}
+
+.selectedusers{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin-right: 10px;
+    
+}
+.cancel{
+    border:none;
+    background-color:lightblue;
+}
+.cancel:focus{
+    outline:none;
+}
+.cancel i{
+    font-size:14px;
+}
+
+.selectedUser {
+    display: inline-block;
+    padding: 5px 10px;
+    margin:5px 2px 1px 5px;
+    background-color: lightblue;
+    border-radius: 10px;
+}
+  
+
+.newsearchbox{
+    flex: 1;
+    min-width: 90%;
+    height: 35px;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: #ececec;
+    font-size: 17px;
+    padding: 10px;
+     border:none;
+}
+
+.divchatbutton{
+    text-align: center;
+    margin-bottom:10px;
+}
+
+#createchatbutton{
+    border:none;
+    width:56px;
+    height:35px;
+    border-radius:10px;
+    color:black;
+}
+.searchbox{
+    width:100%;
+    height:35px;
+    border:1px solid black;
+    border-radius:50px;
+    background-color:#ececec;
+    font-size:17px;
+    padding: 10px;
+}
+
+
+
+/* chat page styling */
+
+/* header part */
+
+.chattitlecontainer{
+    display :flex;
+    flex-direction:row;
+    height:70px;
+    border-bottom: 1.5px black solid;
+}
+
+.chattitlecontainer h1{
+    flex:6;
+    padding:20px 0px 0px 40px;
+}
+
+.chattitlecontainer .chatsearchcontainer{
+    align-content:center;
+    flex:0.5;
+    padding:20px 10px 10px 10px; 
+}
+
+.chattitlecontainer .chatsearchcontainer a,.chattitlecontainer .chatcreatebutton a{
+    padding:20px 10px 10px 10px; 
+    cursor:pointer;
+}
+
+.chattitlecontainer .chatcreatebutton{
+    align-content:center;
+    justify-content:center;
+    flex:0.5;
+    padding:20px 10px 10px 10px; 
+}
+
+
+
