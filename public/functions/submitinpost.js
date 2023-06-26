@@ -57,7 +57,6 @@ $(".postpicuploadbutton").click(event=>{
 
     $('#postpicmodal').modal('hide');
     if(croppeddata!==undefined){
-        console.log(croppeddata)
         const submitbutton=$("#submitpostbutton");
         submitbutton.prop("disabled",false);
     }

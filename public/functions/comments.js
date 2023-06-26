@@ -60,7 +60,6 @@ $("#commentpicupload").change(event=>{
             aspectRatio:1/1,
             background:false,
         });
-
     }
 
     reader.readAsDataURL(file);
@@ -74,11 +73,13 @@ $(".commentpicuploadbutton").click(event=>{
 
     croppeddata=cropper.getCroppedCanvas();
 
+
+
     $('#commentpicmodal').modal('hide');
     if(croppeddata!==undefined){
-        console.log(croppeddata)
         const submitcommentbutton=$("#submitcommentbutton");
         submitcommentbutton.prop("disabled",false);
+        $(".commentpicpreview").html("");
     }
 
 })
@@ -87,7 +88,7 @@ $("#submitcommentbutton").click(async ()=>{
 
     const button=$("#submitcommentbutton")
 
-    const supply=$(".supply")
+    const supply=$(".supplycomment")
 
     const username=document.getElementsByClassName("postcontainer");
     const a=username[0];
@@ -131,6 +132,8 @@ $("#submitcommentbutton").click(async ()=>{
             button.prop("disabled",true);
             var html=createcommenthtml(postdata,val);
             supply[0].insertAdjacentHTML("beforeend",html);
+            cropper=null;
+            croppeddata=null;
         }
     })
 

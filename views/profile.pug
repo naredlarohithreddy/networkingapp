@@ -27,7 +27,7 @@ block content
                                 i.fa-solid.fa-camera.fa-2xl
                 .messagesbutton  
                     - if(user._id!=userloggedin._id)
-                        a.profilemessagebutton(href=`/messages/${user._id}`)
+                        a.profilemessagebutton(href=`/chats/${user._id}`)
                             i.fas.fa-envelope
                         - id=userloggedin._id;
                         - if(user.followers && user.followers.includes(id))
@@ -49,7 +49,7 @@ block content
                 +createtab("Posts",`/profile/${user.username}`,selectedtab!="replies")
                 +createtab("Replies",`/profile/${user.username}/replies`,selectedtab=="replies")
 
-    .supply
+    .supplyprofile
 
     +createprofilepicmodal()
     +createcoverpicmodal()

@@ -1,7 +1,6 @@
-extends layouts/chat-layout.pug
+extends layouts/pschatlayout.pug
 
 block content   
-
 
         .divforsearch
             .newsearchbarcontainer 
@@ -11,7 +10,8 @@ block content
                 
             .divchatbutton
                 button#createchatbutton(disabled) create 
-        .supply
+                
+        .supplychats
 
 block scripts 
     script(src="/functions/chats.js") 

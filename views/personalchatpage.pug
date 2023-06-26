@@ -1,0 +1,30 @@
+extends ./layouts/home-layout.pug
+
+block content
+
+    script.     
+        var chatid='!{chat._id}'
+        var bool='!{isgroupchat}'
+    
+    .chat
+        .chatheader 
+            +createChatImage(chat,user)
+            span#personalchatname(data-toggle="modal", data-target="#chatname") THIS IS THE HEADER
+
+        .chatinside
+            .loadingspin
+                img(src="/images/loadingSpinner.gif", alt="not loaded")
+            ul.showmessages(style="visibility:hidden")
+
+            .typing
+                img(src="/images/dots.gif", alt="message loading")
+
+            .chatfooter(style="visibility:hidden")
+                textarea.chatnameinput(name="chatfootertext", placeholder="Type a message...")
+                button#postchatbutton(disabled) 
+                    i.fa-solid.fa-paper-plane
+
+    +chatnameinputmodal()
+
+block scripts 
+    script(src="/functions/personalchatpage.js") 

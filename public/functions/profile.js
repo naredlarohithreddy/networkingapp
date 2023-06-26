@@ -3,12 +3,12 @@ var cropper;
 $(document).ready(()=>{
     if(selected=="posts"){
         $.get("/api/posts/",{user:postedby._id,isreply:false},(results)=>{
-            outputprofilepost(results,$(".supply"));
+            outputprofilepost(results,$(".supplyprofile"));
         })
     }
     else{
         $.get("/api/posts/",{user:postedby._id,isreply:true},(results)=>{
-            outputprofilepost(results,$(".supply"));
+            outputprofilepost(results,$(".supplyprofile"));
         })
     }
 })
@@ -183,7 +183,6 @@ $(document).ready(()=>{
 function outputprofilepost(results,element){
     element.html=""
     results.forEach(async result => {
-        console.log(result.pinned);
         if(result.pinned){
             var firsthtml=createprofileposthtml(result,true);
             const firstchild=element[0].childNodes[1];

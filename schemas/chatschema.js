@@ -6,7 +6,7 @@ var chatschema=new schema({
     chatname:{type:String,trim:true},
     users:[{type:schema.Types.ObjectId, ref:"userinfo"}],
     groupchat:{type:Boolean,default:false},
-    latestmessage:{type:String}
+    latestmessage:{type:schema.Types.ObjectId, ref:"messageinfo"}
 },{timestamps:true});
 
 var chatinfo=mongoose.model('chatinfo',chatschema);

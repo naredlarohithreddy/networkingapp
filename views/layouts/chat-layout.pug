@@ -12,30 +12,26 @@ html(lang="en")
     body
         script.
             var userjs=!{userjs}
-        .wrapper   
-            .row
-                nav.col-2
-                    -userparsed=JSON.parse(userjs)
-                    a(href=`/profile/${userparsed['username']}`)
-                        i.fa-solid.fa-user.fa-lg
-                    a(href="/")
-                        i.fa-solid.fa-house.fa-lg
-                    a(href="/search")
-                        i.fa-solid.fa-magnifying-glass.fa-lg
-                    a(href="/chats")
-                        i.fa-brands.fa-rocketchat.fa-lg
-                    a(href="/post")
-                        i.fa-solid.fa-plus
+        header
+                .chattitlecontainer
+                    h1 #{title}
+                    .chatsearchcontainer 
+                        a(href='/chats/search') 
+                            i.fa-solid.fa-magnifying-glass.fa-lg
+                    .chatcreatebutton   
+                        a(href='/chats/newChat') 
+                            i.fa-solid.fa-plus 
+                    .homecontainer
+                        a(href="/")
+                            i.fa-solid.fa-house.fa-lg
+        .cwrapper  
+            .crow
+                .col-2
                 .mainsection.col-md-8.col-10.col-lg-6 
-                    .chattitlecontainer 
-                        h1 #{title}
-                        block searchbar
-                    block content
+                    .totalchatcontainer
+                        block content
                 .extra.d-none.d-md-block.col-md-2.col-lg-4    
-                    a(href="/settings")
-                        i.fa-solid.fa-gear.fa-lg
-                        
-        
+            
         script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js', integrity='sha512-tWHlutFnuG0C6nQRlpvrEhE4QpkG1nn2MOUMWmUeRePl4e3Aki0VB6W1v3oLjFtd0hVOtRQ9PHpSfN6u6/QXkQ==', crossorigin='anonymous', referrerpolicy='no-referrer')
         script(src='https://kit.fontawesome.com/a7b2a69afe.js', crossorigin='anonymous')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js', integrity='sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ==', crossorigin='anonymous', referrerpolicy='no-referrer')

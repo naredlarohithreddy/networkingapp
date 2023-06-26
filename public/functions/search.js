@@ -7,7 +7,7 @@ $(document).ready(()=>{
             value=input.val().trim();
 
             if(value==""){
-                $(".supply").html="";
+                $(".supplysearch").html="";
             }
             else{
                 search(value,selectedtab);
@@ -19,7 +19,7 @@ $(document).ready(()=>{
 
 function search(value,selectedtab){
     var url=selectedtab=="users"?"/api/users":"/api/posts";
-    var region=$(".supply");
+    var region=$(".supplysearch");
     var element=region[0]
 
     $.get(url,{data:value},(results)=>{

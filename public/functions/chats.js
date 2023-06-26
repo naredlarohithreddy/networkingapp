@@ -24,7 +24,7 @@ $(document).ready(()=>{
             value=input.val().trim();
 
             if(value==""){
-                $(".supply").html("");
+                $(".supplychats").html("");
             }
             else{
                 search(value);
@@ -36,7 +36,7 @@ $(document).ready(()=>{
 
 function search(value){
     var url="/api/users";
-    var region=$(".supply");
+    var region=$(".supplychats");
 
     $.get(url,{data:value},(results)=>{
         region.html("");
@@ -69,7 +69,7 @@ function appendinto(user) {
     selectedusers.push(user);
     updateSelectedUsersHtml()
     $(".newsearchbox").val("").focus();
-    $(".supply").html("");
+    $(".supplychats").html("");
     $("#createchatbutton").prop("disabled", false);
 }
 
@@ -113,15 +113,7 @@ $("#createchatbutton").click(event=>{
     $.post("/api/chat",{data:users},(result)=>{
         window.location.href=`/chats/${result._id}`;
     })
-    // $.ajax({
-    //     url:"/api/chat",
-    //     type:"post",
-    //     data:users,
-    //     contentType:'application/json',
-    //     success:(result)=>{
-    //         window.location.url=`/chats/${result._id}`;
-    //     }
-    // })
+
 })
 
 function createtab(result,string){
@@ -135,6 +127,10 @@ function createtab(result,string){
             text="Follow";
         }
     }
+    var src="";
+    if(result.profilepicture!=undefined){
+        src=`<img src=${result.profilepicture}></img>`;
+    }
 
     var buttonclass =(text==="Following") ? "follow following" : "follow notfollowing"   
     var followbutton=""
@@ -143,7 +139,7 @@ function createtab(result,string){
     }
     return `
         <div class="profiletab">
-            <div class="imgcontainerff"><img src=${result.profilepicture}></img></div>
+            <div class="imgcontainerff">${src}</div>
             <div class="usernameff"><a href="/profile/${result.username}">${result.username}</a></div>
             ${followbutton}
         </div>
