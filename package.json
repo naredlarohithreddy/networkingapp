@@ -7,14 +7,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://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@github.com/naredlarohithreddy/twitterclone.git"
+    "url": "git+https://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@github/naredlarohithreddy/networkingapp"
   },
   "author": "naredlarohithreddy",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/naredlarohithreddy/twitterclone/issues"
+    "url": "https://github.com/naredlarohithreddy/networkingapp/issues"
   },
-  "homepage": "https://github.com/naredlarohithreddy/twitterclone#readme",
+  "homepage": "https://github.com/naredlarohithreddy/networkingapp#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.0",
     "bcrypt": "^5.1.0",
