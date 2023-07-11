@@ -137,6 +137,10 @@ $("#submitcommentbutton").click(async ()=>{
         }
     })
 
+    $.get(`/api/users`,{username:val},(result)=>{
+        emitnotification(result._id)
+    })
+
 })
 
 function createcommenthtml(postdata,val){
@@ -184,7 +188,7 @@ function createcommenthtml(postdata,val){
                             <button class="retweetbutton"><i class="fas fa-retweet"><span>${postdata.retweetusers.length||""}</span></i></button>
                         </div>
                         <div class="postButtonContainer red">
-                            <button class="likebutton"><i class="far fa-heart"></i><span>${postdata.likes.length||""}</span></button>
+                            <button class="likebutton"><i class="far fa-heart"><span>${postdata.likes.length||""}</span></i></button>
                         </div>
                     </div>
                 </div>

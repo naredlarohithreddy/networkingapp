@@ -21,7 +21,7 @@ function createchattab(result){
     
     var latestmessage="THIS IS THE LATEST MESSAGE"
     if(result.chatname===""){
-        chatname="";
+        var chatname="";
         result.users.forEach(x=>{
             chatname+=x.username
             chatname+=','

@@ -6,7 +6,7 @@ $(document).ready(()=>{
     socket.emit("join room",chatid)
     socket.on("typing",()=>{$(".typing").show();});
     socket.on("stop typing", () => $(".typing").hide());
-    
+    $("#postchatbutton").prop("disabled",true);
 
     $.get(`/api/chat/${chatid}`,(results)=>{
         var content;
@@ -31,7 +31,7 @@ $(document).ready(()=>{
 
             lastsenderid=message.sentuser._id;
         })
-
+        
         var messageelement=messages.join("");
         $(".showmessages").append(messageelement);
         scrolltoheight(false);
@@ -41,6 +41,8 @@ $(document).ready(()=>{
         $(".chatfooter").css("visibility","visible");
         
     })
+
+    messagebadge();
 })
 
 function createname(result){
@@ -79,6 +81,10 @@ $(".postchatbutton").click((event)=>{
 
 $(".chatnameinput").keydown((event)=>{
 
+    if($(".chatnameinput").val().trim().length()>0){
+        $("#postchatbutton").prop("disabled",false);
+    }
+
     if(!connected) return;
 
     if(!typing) {
@@ -106,26 +112,34 @@ $("#postchatbutton").click(()=>{
     socket.emit("chat submit",x);
     var showmessages=$(".showmessages");
     $.post(`/api/messages/${chatid}`,{content:value})
-        .done((results, status, xhr) => {
-            console.log(results)
-            if(xhr.status!=202){
-                alert("could not load the message");
-                $(".chatnameinput")[0].value=x;
-                return;
-            }
+    .done((results, status, xhr) => {
+        if(xhr.status!=202){
+            alert("could not load the message");
+            $(".chatnameinput")[0].value=x;
+            return;
+        }
 
-            var html=createelement(results,null,"");
-            showmessages.append(html);
-            scrolltoheight(false);
-            
+        displaymessage(showmessages,results);
+        emitnotification(chatid)
 
-        })
+        if(connected){
+            socket.emit("new message",results);
+        }
+
+    })
     
-        socket.emit("stop typing", chatid);
-        typing = false;
+    socket.emit("stop typing", chatid);
+    typing = false;
     $(".chatnameinput").val("");
+    $("#postchatbutton").prop("disabled",true);
     value="";
 })
+
+function displaymessage(showmessages,results){
+    var html=createelement(results,null,"");
+    showmessages.append(html);
+    scrolltoheight(false);
+}
 
 function createelement(results,nextmsg,lastsenderid){
 

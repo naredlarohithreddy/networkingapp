@@ -4,6 +4,8 @@ const app=express();
 const router=express.Router();
 const userinfo=require("../../schemas/userschema");
 const postinfo=require("../../schemas/postschema");
+const notificationinfo=require("../../schemas/notificationschema");
+
 app.set("view engine","pug");
 app.set("views","views");
 
@@ -49,6 +51,13 @@ router.post("/",upload.single("croppeddata"),(req,res,next)=>{
         newpost=await postinfo.populate(newpost,{path:"commentdata"});
         newpost=await userinfo.populate(newpost,{path:"user"});
         newpost=await userinfo.populate(newpost,{path:"commentdata.user"});
+
+        var string=req.session.user._id.toString();
+        if(req.session.user._id!=newpost.user._id){
+            
+            await notificationinfo.insertNotification(req.session.user._id,newpost.commentdata.user._id,"comment",newpost._id)
+            .catch(err=>console.log(err));
+        }
             
         res.status(201).send(newpost);
     })

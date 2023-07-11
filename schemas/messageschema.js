@@ -9,4 +9,6 @@ schema=new schema({
     chatid:{type:schema.Types.ObjectId, ref:"chatinfo"}
 },{timestamps:true});
 
-module.exports=mongoose.model("messageinfo",schema)
+messageinfo=mongoose.model("messageinfo",schema);
+
+module.exports=messageinfo;

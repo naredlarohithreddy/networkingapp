@@ -1,3 +1,9 @@
+$(document).ready(()=>{
+    //wait with timer
+    notificationbadge();
+    messagebadge();
+})
+
 $("#deletepostmodal").on("show.bs.modal",(event)=>{
 
     var button=$(event.relatedTarget);
@@ -53,8 +59,8 @@ $(document).ready(()=>{
             var a=closestelement[0];
             var parent=closestelement[0].parentElement;
             const retweetcontainer=element.closest(".retweetcontainer");
-            var b=a.attributes["data-id"];
-            var c=b.nodeValue;
+            var b=a?.attributes["data-id"];
+            var c=b?.nodeValue;
             var postId =c;
 
             var d=parent?.childNodes[1];
@@ -101,6 +107,7 @@ $(document).ready(()=>{
 
                     var userloggedin=userjs;
                     if(data.likes.includes(userloggedin._id)){
+                        emitnotification(data.user)
                         element.addClass("active");
                     }
                     else{
@@ -130,6 +137,7 @@ $(document).ready(()=>{
 
                     var userloggedin=userjs;
                     if(data.retweetusers.includes(userloggedin._id)){
+                        emitnotification(data.user)
                         element.addClass("active");
                     }
                     else{
@@ -181,11 +189,14 @@ $(document).ready(()=>{
 })
 
 
-function createposthtml(postdata){
+function createposthtml(postdata,like=false,retweet=false){
 
     if(postdata._id===undefined){
         alert("not populated")
     }
+    var likeclass="",retweetclass="";
+    if(like)likeclass="active"
+    if(retweet)retweetclass="active"
 
     var isretweet=postdata.retweetdata!==undefined;
     var isretweet=postdata.retweetdata==null?0:1;
@@ -209,7 +220,6 @@ function createposthtml(postdata){
                 commentpost=results.commentData;
                 g=commentpost.user;
                 commenteduser=g.username;
-                //console.log(commenteduser);
             })
         }
         else if(g.username===undefined){
@@ -217,12 +227,10 @@ function createposthtml(postdata){
                 commentpost=results.commentData;
                 g=commentpost.user;
                 commenteduser=g.username;
-                //console.log(commenteduser);
             })
         }
         else{
             if(g.username)commenteduser=g.username;
-            //console.log(commenteduser);
         }
     }
     
@@ -277,10 +285,10 @@ function createposthtml(postdata){
                             <a href="/comment"><button class="commentbutton"><i class="far fa-comment"></i></button></a>
                         </div>
                         <div class="postButtonContainer green">
-                            <button class="retweetbutton"><i class="fas fa-retweet"><span>${postdata.retweetusers.length||""}</span></i></button>
+                            <button class="retweetbutton ${retweetclass}"><i class="fas fa-retweet"><span>${postdata.retweetusers.length||""}</span></i></button>
                         </div>
                         <div class="postButtonContainer red">
-                            <button class="likebutton"><i class="far fa-heart"></i><span>${postdata.likes.length||""}</span></button>
+                            <button class="likebutton ${likeclass}"><i class="far fa-heart"></i><span>${postdata.likes.length||""}</span></button>
                         </div>
                     </div>
                 </div>
@@ -295,15 +303,30 @@ function createposthtml(postdata){
 
 function outputpost(results,element){
     element.html=""
+    var userlogged=userjs;
+    var id=userlogged._id.toString();
     results.forEach(async result => {
-        var html=createposthtml(result);
+        console.log(result)
+        var html;
+        if(result.likes.includes(id) && result.retweetusers.includes(id)){
+            html=createposthtml(result,true,true);
+        }
+        else if(result.likes.includes(id)){
+            html=createposthtml(result,true);
+        }
+        else if(result.retweetusers.includes(id)){
+            html=createposthtml(result,false,true);
+        }
+        else{
+            html=createposthtml(result);
+        }
+        
         element.append(html);
     });
     if(results.length==0){
         element.append("<span class='noresults'>NO RESULTS FOUND</span>")
     }
 }
-
 function outputPostsWithReplies(results,element){
     element.html("");
 
@@ -458,4 +481,192 @@ function timeDifference(current, previous) {
     else {
         return Math.round(elapsed/msPerYear ) + ' years ago';   
     }
+}
+
+function realtimemessage(message){
+    if($(".showmessages").length==0){
+        showmessagepopup(message)
+        if(window.location.pathname=="/chats"){
+            location.reload();
+        }
+        messagebadge();
+    }
+    else{
+        var showmessages=$(".showmessages");
+        displaymessage(showmessages,message);
+        var id=message._id.toString();
+        function makeAjaxRequest() {
+            return new Promise(function(resolve, reject) {
+              $.ajax({
+                url: `/api/messages/update/${id}`,
+                type: "PUT",
+                data: id,
+                success: function(results) {
+                  resolve(results);
+                },
+                error: function(err) {
+                  reject(err);
+                }
+              });
+            });
+          }
+          
+          makeAjaxRequest()
+            .then(function(results) {
+              messagebadge();
+            })
+            .catch(function(err) {
+              console.log(err);
+            });
+    }
+}
+
+function messagebadge(){
+    $.get("/api/chat",{readonly:false},(results)=>{
+        var size=results.length;
+        console.log(results)
+        if(size>0){
+            $("#messagesbadge").text(size).addClass("active");
+        }
+        else{
+            $("#messagesbadge").text("").removeClass("active")
+        }
+    })
+}
+
+function markasread(notificationid=null,callback=null){
+    if(callback==null)callback=()=>location.reload();
+
+    var url=notificationid!=null?`api/notifications/${notificationid}/markasread`:`api/notifications/markasread`;
+
+    $.ajax({
+        url:url,
+        type:"PUT",
+        success:()=>callback()
+    })
+}
+
+function notificationbadge(){
+    $.get("/api/notifications",{readonly:false},(results)=>{
+        var size=results.length;
+        if(size>0){
+            $("#notificationsbadge").text(size).addClass("active");
+        }
+        else{
+            $("#notificationsbadge").removeClass("active")
+        }
+    })
+}
+
+function showmessagepopup(data){
+    console.log(data);
+    var html=createchat(data);
+    var element=$(html);
+    element.hide().prependTo("#notificationlist").slideDown("fast");
+
+    setTimeout(()=>element.fadeOut(400),5000);
+}
+
+function createchat(results){
+
+    
+    var sendername=results.chatid.chatname;
+    var sender=results.sentuser;
+    var name=sender.username;
+
+    var senderhtml="";
+    senderhtml=`<span class="sendername">${sendername}</span>`
+
+    var profileimg="";
+    profileimg=`<img src=${sender.profilepicture}/>`;
+
+    var imagecontainer="";
+    imagecontainer=`<div class="chatimgcontainer">
+                            ${profileimg}
+                        </div>`
+
+    return `<li class="messages">
+                ${imagecontainer}
+                <div class="msgcontainer">
+                    ${senderhtml}
+                    <div class="maincon">
+                        <span class="sentname">
+                            ${name}  :
+                        </span>
+                        <span class="messagebody">
+                            ${results.content}
+                        </span>
+                    </div>
+                </div>
+            </li>`
+    
+}
+
+function shownotificationpopup(data){
+    var html=createnotihtml(data);
+    var element=$(html);
+    element.hide().prependTo("#notificationlist").slideDown("fast");
+
+    setTimeout(()=>element.fadeOut(400),5000);
+}
+
+function createnotihtml(result){
+
+    var sentfrom=result.sentfrom.username;
+    var message = getNotificationText(result);
+    var profileimg=`<img src=${result.sentfrom.profilepicture} alt="default"/>`;
+    var href=getNotificationUrl(result);
+    var className = result.read ? "" : "active";
+
+    return `
+        <a href='${href}' class="notify ${className}" data-id=${result._id}>
+            <div class="notiimg">${profileimg}</div>
+            <div class="latestnotify">
+                <span class="lastestnotifyspan">
+                    ${message}
+                </span>
+            </div>
+        </a>
+    
+    `
+}
+
+function getNotificationText(result) {
+
+    var sentfrom = result.sentfrom;
+
+    var sentfromName = `${sentfrom.username}`;
+    
+    var text;
+
+    if(result.type == "retweet") {
+        text = `${sentfromName} retweeted one of your posts`;
+    }
+    else if(result.type == "like") {
+        text = `${sentfromName} liked one of your posts`;
+    }
+    else if(result.type == "comment") {
+        text = `${sentfromName} replied to one of your posts`;
+    }
+    else if(result.type == "follow") {
+        text = `${sentfromName} followed you`;
+    }
+
+    return text;
+}
+
+function getNotificationUrl(result) { 
+    var url = "#";
+
+    if(result.type == "retweet" || 
+        result.type == "like" || 
+        result.type == "comment") {
+            
+        url = `/posts/${result.entity}`;
+    }
+    else if(result.type == "follow") {
+        url = `/profile/${result.entity}`;
+    }
+
+    return url;
 }

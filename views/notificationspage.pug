@@ -1,0 +1,16 @@
+extends ./layouts/notification-layout.pug
+
+
+block content   
+
+    .chattitlecontainernew
+        .chatheadings
+            h1 #{title}
+            .chatcreatebuttonnew   
+                button#markallasread
+                    i.fas.fa-check-double
+
+    .supplynew
+
+block scripts 
+    script(src="/functions/notifications.js")   

@@ -94,6 +94,18 @@ router.get("/",async (req,res,next)=>{
 
 })
 
+router.get("/:id",async (req,res,next)=>{
+
+    const payload={
+        title:"POST",
+        postid:req.params.id,
+        userjs:JSON.stringify(req.session.user),
+        userloggedin:req.session.user._id,
+    }
+        
+    res.status(200).render("displayposts",payload);
+
+})
 function timeDifference(current, previous) {
 
     var msPerMinute = 60 * 1000;

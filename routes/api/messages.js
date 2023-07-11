@@ -7,6 +7,7 @@ const path=require('path');
 const userinfo=require("../../schemas/userschema");
 const chatinfo=require("../../schemas/chatschema");
 const messageinfo=require("../../schemas/messageschema");
+const notificationinfo=require("../../schemas/notificationschema");
 const multer=require("multer");
 
 
@@ -21,21 +22,6 @@ app.set("views","views");
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended:false}))
 
-// router.get("/",async (req,res,next)=>{
-//     await chatinfo.find({users :{$elemMatch : {$eq : req.session.user._id}}})
-//     .populate("users")
-//     .sort({updatedAt:-1})
-//     .then((results)=>{return res.status(200).send(results)})
-//     .catch(err=>console.log(err));
-// })
-
-// router.get("/:chatid",async (req,res,next)=>{
-//     await chatinfo.findOne({_id:req.params.chatid,users :{$elemMatch : {$eq : req.session.user._id}}})
-//     .populate("users")
-//     .sort({updatedAt:-1})
-//     .then((results)=>{return res.status(200).send(results)})
-//     .catch(err=>console.log(err));
-// })
 
 router.post("/:id",async (req,res,next)=>{
     
@@ -52,30 +38,53 @@ router.post("/:id",async (req,res,next)=>{
         results=await results.populate("chatid");
         results=await userinfo.populate(results,{path:"chatid.users"});
 
-        chatinfo.findByIdAndUpdate(req.params.id,{latestmessage:results})
+        await messageinfo.updateOne(
+            { _id: results._id },
+            { $push: { readusers: req.session.user._id} }
+        );
+        
+        var chat=await chatinfo.findByIdAndUpdate(req.params.id,{latestmessage:results._id},{new:true})
         .catch(err=>console.log(err));
 
+        chat.users.forEach(async user=>{
+            if(req.session.user._id!=user._id){
+                await notificationinfo.insertNotification(req.session.user._id,user._id,"message",chat._id)
+                .catch(err=>console.log(err));
+            }
+        })
+        
+        await chat.save();
         res.status(202).send(results)
     })
     .catch(err=>console.log(err));
 })
 
-// router.put("/:id",async (req,res,next)=>{
+router.put("/update/:id", async (req, res, next) => {
+    try {
+        const id = req.params.id;
+    
+        const updatedMessage = await messageinfo.findByIdAndUpdate(
+            id,
+            { $push: { readusers: req.session.user._id } },
+            { new: true }
+        );
+    
+        const chat = await chatinfo
+        .findById(updatedMessage.chatid)
+        .populate("latestmessage");
 
-//     var chatid=req.params.id;
-//     var results=await chatinfo.findByIdAndUpdate(chatid,req.body,{new:true})
-//     .catch(err=>console.log(err));
+        if (!chat.latestmessage.readusers.includes(req.session.user._id)) {
+            chat.latestmessage.readusers.push(req.session.user._id);
+            await chat.save();
+        }
+        
+  
+        res.status(200).send(chat);
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  });
 
-//     return res.status(202).send(results);
-// })
-// function createname(result){
-//     chatname="";
-//     result.forEach(x=>{
-//         chatname+=x.username
-//         chatname+=','
-//     });
-//     chatname=chatname.slice(0,-1);
-//     return chatname;
-// }
 
 module.exports=router;

@@ -8,11 +8,20 @@ const app=express();
 const middleware=require("./middleware");
 
 const server=app.listen(3003,()=>{console.log("listening")});
-const io=require("socket.io")(server);
+const io=require("socket.io")(server, {
+    // serveClient: (config.env === 'production') ? false : true,
+    pingInterval: 5000, // Interval in milliseconds between sending ping packets
+    pingTimeout: 10000, // Timeout in milliseconds for a client to respond to pings
+});
 
 app.use(bodyparser.urlencoded({extended:false}));
 //session middleware function
 app.use(session({
+    cookie: {
+        path    : '/',
+        httpOnly: false,
+        maxAge  : 24*60*60*1000
+    },
     secret:"Rohith",//used to authenticate a session
     saveUninitialized:true,//session is created but not modified
     resave:false,
@@ -42,22 +51,28 @@ const commentpostsrouter=require("./routes/api/commentposts");
 const getprofiledetails=require("./routes/api/users");
 const chatsrouter=require("./routes/api/chats");
 const messagesrouter=require("./routes/api/messages");
+const notificationsapirouter=require("./routes/api/notificationsapi");
+const notificationsrouter=require("./routes/notifications");
 
 app.use("/api/posts",postrouter);
 app.use("/api/commentposts",commentpostsrouter);
 app.use("/api/messages",messagesrouter);
+app.use("/chats",chatspage);
+app.use("/api/notifications",notificationsapirouter);
 
 app.use("/login",loginrouter);
 app.use("/register",registerrouter);
 app.use("/api/users",getprofiledetails);
 app.use("/api/chat",chatsrouter);
 
+app.use("/chats",chatspage);
+app.use("/notifications",notificationsrouter);
 app.use("/comment",comment);
 app.use("/posts",middleware.requirelogin,displayposts);
 app.use("/profile",profilerouter);
 app.use("/uploads",uploadsrouter);
 app.use("/search",searchrouter);
-app.use("/chats",chatspage);
+
 
 
 io.on("connection",(socket)=>{
@@ -65,16 +80,31 @@ io.on("connection",(socket)=>{
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
-    // socket.on("chat submit",input=>console.log(input));
+
     socket.on("setup",(userdata)=>{
         socket.join(userdata._id)
         socket.emit("connected")
     })
+    
     socket.on("join room",(chatid)=>{
         socket.join(chatid)
     })
+
     socket.on("typing",roomid=>socket.in(roomid).emit("typing"));
     socket.on("stop typing", roomid => socket.in(roomid).emit("stop typing"));
+    socket.on("new message", message => {
+        var room=message.chatid;
+
+        if(!room.users)console.log("users are not populated");
+
+        room.users.forEach(user=>{
+            if(user._id==message.sentuser._id.toString())return;
+            socket.in(user._id).emit("message received",message)
+        })
+    });
+
+    socket.on("notification received",roomid => socket.in(roomid).emit("notification received"));
+
 })
 
 app.get("/post",(req,res,next)=>{

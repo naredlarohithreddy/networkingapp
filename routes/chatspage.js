@@ -27,8 +27,11 @@ router.get("/newChat",async (req,res,next)=>{
 
 router.get("/:id",async (req,res,next)=>{
 
+    if(req.session.user===undefined)return res.sendStatus(400);
     var id=req.params.id;
     var loggedin=req.session.user;
+    
+    var loggedinid=req.session.user._id;
     var isvalid=mongoose.isValidObjectId(id);
 
     const payload=createpayload(loggedin,"Chat");
@@ -37,7 +40,7 @@ router.get("/:id",async (req,res,next)=>{
         return res.status(200).render("emptypage",payload);
     }
 
-    var chat=await chatinfo.findOne({_id:id},{users:{$elemMatch:{$eq:req.session.user._id}}})
+    var chat=await chatinfo.findOne({_id:id},{users:{$elemMatch:{$eq:loggedinid}}})
     .populate("users");
 
     if(chat==null){

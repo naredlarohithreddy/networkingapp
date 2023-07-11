@@ -6,6 +6,8 @@ const fs=require('fs');
 const path=require('path');
 const userinfo=require("../../schemas/userschema");
 const postinfo=require("../../schemas/postschema");
+const notificationinfo=require("../../schemas/notificationschema");
+
 const multer=require("multer");
 const { profile } = require('console');
 
@@ -149,6 +151,22 @@ router.put("/:id/like",async (req,res,next)=>{
         console.log(err)
     })
     
+    var string=req.session.user._id.toString();
+
+    if(!liked && string!=post.user._id){
+
+        await userinfo.find({retweet:{$elemMatch:{$eq:post._id}}})
+        .then((rusers)=>{
+            rusers.forEach(async ruser=>{
+                if(ruser._id!=string && ruser._id!=post.user._id){
+                    await notificationinfo.insertNotification(req.session.user._id,ruser._id,"like",post._id)
+                    .catch(err=>console.log(err));
+                }
+            })
+        })
+        await notificationinfo.insertNotification(req.session.user._id,post.user._id,"like",post._id)
+        .catch(err=>console.log(err));
+    }
 
     res.status(200).send(post)
 
@@ -188,6 +206,11 @@ router.put("/:id/retweet",async (req,res,next)=>{
         console.log(err)
     })
     
+    var string=req.session.user._id.toString();
+    if(!deletedpost && string!=post.user._id){
+        await notificationinfo.insertNotification(req.session.user._id,post.user._id,"retweet",repost._id)
+        .catch(err=>console.log(err));
+    }
 
     res.status(200).send(post)
 

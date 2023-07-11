@@ -27,6 +27,16 @@ router.get("/",async (req,res,next)=>{
     .populate("latestmessage")
     .sort({updatedAt:-1})
     .then(async (results)=>{
+
+        if(req.query.readonly!==undefined && req.query.readonly=="false"){
+            results=results.filter(r=>
+                r.latestmessage !== undefined &&
+                r.latestmessage !== null &&
+                r.latestmessage.readusers !== undefined &&
+                !r.latestmessage.readusers.includes(req.session.user._id)    
+            );
+        }
+
         results=await userinfo.populate(results,{path:"latestmessage.sentuser"})
         return res.status(200).send(results)
     })
@@ -39,6 +49,20 @@ router.get("/:chatid",async (req,res,next)=>{
     .populate("latestmessage")
     .sort({updatedAt:-1})
     .then(async (results)=>{
+
+        await messageinfo.find({chatid:req.params.chatid})
+        .then(async (messages)=>{
+            for (const message of messages) {
+                if(!(message.readusers.includes(req.session.user._id))){
+                    var id=message._id;
+                    await messageinfo.findByIdAndUpdate(
+                        id,
+                        { $push: { readusers: req.session.user._id } }
+                    );
+                }
+            }
+        })
+
         results=await userinfo.populate(results,{path:"latestmessage.sentuser"})
         return res.status(200).send(results)
     })

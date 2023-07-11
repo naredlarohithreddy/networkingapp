@@ -161,6 +161,7 @@ $(document).ready(()=>{
                     button.removeClass("notfollowing");
                     button.addClass("following");
                     button[0].childNodes[0].data="Following";
+                    emitnotification(userid)
                 }
                 else{
                     console.log("no")

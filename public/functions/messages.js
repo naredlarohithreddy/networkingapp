@@ -25,8 +25,12 @@ function createchattab(result){
     
     var chatname=result.chatname;
     var latestmessage="NEW CHAT";
+    var sendername="";
     if(result.latestmessage!=null)
-        latestmessage= `${result.latestmessage.sentuser.username} : ${result.latestmessage.content}`;
+        latestmessage=result.latestmessage.content
+    if(result.latestmessage!=null)
+        sendername=result.latestmessage.sentuser.username;
+        
     if(chatname==="newchat" || result.chatname===""){
         chatname="";
         result.users.forEach(x=>{
@@ -49,8 +53,15 @@ function createchattab(result){
         <div class="onechat" data-id=${result._id}>
             <div class="chatimg ">${profileimg}</div>
             <div class="chattab">
-                <div class="chatname ellipsis">${chatname}</div>
-                <div class="latestmessage ellipsis">${latestmessage}</div>
+                <div class="sendername">${chatname}</div>
+                <div class="maincon">
+                    <span class="sentname">
+                        ${sendername}  :
+                    </span>
+                    <span class="messagebody">
+                        ${latestmessage}
+                    </span>
+                </div>
             </div>
         </div>
     `

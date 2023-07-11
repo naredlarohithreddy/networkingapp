@@ -5,6 +5,7 @@ const router=express.Router();
 const fs=require('fs');
 const path=require('path');
 const userinfo=require("../../schemas/userschema");
+const notificationinfo=require("../../schemas/notificationschema");
 const multer=require("multer");
 
 
@@ -77,6 +78,12 @@ router.put("/:userid/follow",async (req,res,next)=>{
         console.log(error);
         res.sendStatus(400);
     })
+
+    if(!following){
+        await notificationinfo.insertNotification(req.session.user._id,userid,"follow",req.session.user._id)
+        .catch(err=>console.log(err));
+    }
+
 
     res.status(202).send(req.session.user);
 
